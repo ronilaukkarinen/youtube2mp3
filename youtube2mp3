@@ -1,3 +1,4 @@
+#!/bin/bash
 while true; do
 read -p "[?] Kansiossa ei saa olla flv-filuja! Jos on, paina n. Muuten y. (y/n) " yn
     case $yn in
