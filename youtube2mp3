@@ -1,38 +1,38 @@
 #!/bin/bash
 while true; do
-read -p "[?] Kansiossa ei saa olla flv-filuja! Jos on, paina n. Muuten y. (y/n) " yn
+read -p "[?] The current folder can't have mp4 files! Jos on, press n. Otherwise y. (y/n) " yn
     case $yn in
-	[Yy]* ) echo -n ""; break;;
+    [Yy]* ) echo -n ""; break;;
         [Nn]* ) exit;;
-        * ) echo "Vastaa y tai n.";;
+        * ) echo "Please answer y or n.";;
     esac
 done
-echo "[!] Toivottavasti samassa kansiossa ei ole flv-tiedostoja, ne ylikirjoitetaan!"
+echo "[!] I so hope there were no important mp4-files, because those will be overwritten!"
 if [ -z "$1" ]; then
         echo "";echo "Usage: `basename $0` [URL]";echo "";
         exit
 fi
-echo "[+] Haetaan youtuben videoraita, josta ripataan kohta ääniraita..."
-clive "$1"
-echo "[+] Muunnetaan ääniraita mp3-muotoon..."
-ffmpeg -i *.flv -acodec libmp3lame -ac 2 -ab 128k -vn -y mp3.mp3
-echo -n "[?] Anna esittäjä: "
+echo "[+] Getting video, where we will rip out the audio soon.."
+youtube-dl "$1"
+echo "[+] Transforming audio to the quality mp3 format..."
+ffmpeg -i *.mp4 -acodec libmp3lame -ac 2 -ab 128k -vn -y mp3.mp3
+echo -n "[?] Artist name: "
 read -e ARTIST
 #echo "Esittäjä on siis $ARTIST, kiitos!"
 id3v2 -a "$ARTIST" mp3.mp3
-echo -n "[?] Anna kappaleen nimi: "
+echo -n "[?] Track title: "
 read -e TITLE
 #echo "Kappaleen nimi on siis $TITLE, kiitos!"
-echo "[+] Nimetään tiedostonimi ja lisätään id3v2-tagit..."
+echo "[+] Adding id3v2-tags..."
 id3v2 -t "$TITLE" mp3.mp3
 mv mp3.mp3 "$ARTIST - $TITLE.mp3"
-echo "[+] Sekin puoli tästä nyt hoidettu alta poois!"
+echo "[+] Main thing done!"
 while true; do
-    read -p "[?] Poistetaanko kaikki suolletut turhat flv-filut? (y/n) " yn
+    read -p "[?] Do we remove the video file (leftover mp4 file?) (y/n) " yn
     case $yn in
-        [Yy]* ) rm -r *.flv; break;;
+        [Yy]* ) rm -r *.mp4; break;;
         [Nn]* ) exit;;
-        * ) echo "Vastaa y tai n.";;
+        * ) echo "Please answer y or n.";;
     esac
 done
-echo "[!] Kaikki valamista! Kiitos kun käytit rollen paskaa scriptiä!"
+echo "[!] All done! Thanks for using Rolle's shitty script!"
