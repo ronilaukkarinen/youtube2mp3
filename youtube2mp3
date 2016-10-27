@@ -17,19 +17,18 @@ case $response in
         ;;
 esac
 
-echo "[+] Downloading video, extracting audio, and removing video file"
-youtube-dl -x --audio-format mp3 --audio-quality 128K --exec "mv {} $saveDir/mp3.mp3" "$1"
-
 echo "[+] Enter song information for the audio file: "
 echo -n "[?] Artist name: "
 read -e ARTIST
-id3v2 -a "$ARTIST" $saveDir/mp3.mp3
-
 echo -n "[?] Track title: "
 read -e TITLE
-id3v2 -t "$TITLE" $saveDir/mp3.mp3
+FILENAME="$ARTIST - $TITLE.mp3"
 
-mv $saveDir/mp3.mp3 "$ARTIST - $TITLE.mp3"
+echo "[+] Downloading video, extracting audio, and deleting video file"
+youtube-dl -x --audio-format mp3 --audio-quality 128K --exec "mv {} \"$saveDir/$FILENAME\"" "$1"
 
-echo "[!] All done! Enjoy '$ARTIST - $TITLE.mp3'"
+id3v2 -a "$ARTIST" "$saveDir/$FILENAME"
+id3v2 -t "$TITLE" "$saveDir/$FILENAME"
+
+echo "[!] All done! Enjoy $FILENAME"
 echo "[!] Thanks for using Rolle's shitty script!"
