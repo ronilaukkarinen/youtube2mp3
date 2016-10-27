@@ -1,38 +1,34 @@
 #!/bin/bash
-while true; do
-read -p "[?] The current folder can't have mp4 files! Jos on, press n. Otherwise y. (y/n) " yn
-    case $yn in
-    [Yy]* ) echo -n ""; break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer y or n.";;
-    esac
-done
-echo "[!] I so hope there were no important mp4-files, because those will be overwritten!"
+# To Do:
+#  check required dependencies
+#
 if [ -z "$1" ]; then
         echo "";echo "Usage: `basename $0` [URL]";echo "";
         exit
 fi
-echo "[+] Getting video, where we will rip out the audio soon.."
-youtube-dl "$1"
-echo "[+] Transforming audio to the quality mp3 format..."
-ffmpeg -i *.mp4 -acodec libmp3lame -ac 2 -ab 128k -vn -y mp3.mp3
+
+read -r -p "Would you like the .mp3 file saved to your Music folder? (Alternatively, it will be saved in the current working directory) [y/n] " response
+case $response in
+    [yY][eE][sS]|[yY]) 
+        saveDir="~/Music" 
+        ;;
+    *)
+        saveDir="." 
+        ;;
+esac
+
+echo "[+] Enter song information for the audio file: "
 echo -n "[?] Artist name: "
 read -e ARTIST
-#echo "Esittäjä on siis $ARTIST, kiitos!"
-id3v2 -a "$ARTIST" mp3.mp3
 echo -n "[?] Track title: "
 read -e TITLE
-#echo "Kappaleen nimi on siis $TITLE, kiitos!"
-echo "[+] Adding id3v2-tags..."
-id3v2 -t "$TITLE" mp3.mp3
-mv mp3.mp3 "$ARTIST - $TITLE.mp3"
-echo "[+] Main thing done!"
-while true; do
-    read -p "[?] Do we remove the video file (leftover mp4 file?) (y/n) " yn
-    case $yn in
-        [Yy]* ) rm -r *.mp4; break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer y or n.";;
-    esac
-done
-echo "[!] All done! Thanks for using Rolle's shitty script!"
+FILENAME="$ARTIST - $TITLE.mp3"
+
+echo "[+] Downloading video, extracting audio, and deleting video file"
+youtube-dl -x --audio-format mp3 --audio-quality 128K --exec "mv {} \"$saveDir/$FILENAME\"" "$1"
+
+id3v2 -a "$ARTIST" "$saveDir/$FILENAME"
+id3v2 -t "$TITLE" "$saveDir/$FILENAME"
+
+echo "[!] All done! Enjoy $FILENAME"
+echo "[!] Thanks for using Rolle's shitty script!"
