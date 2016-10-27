@@ -31,4 +31,3 @@ id3v2 -a "$ARTIST" "$saveDir/$FILENAME"
 id3v2 -t "$TITLE" "$saveDir/$FILENAME"
 
 echo "[!] All done! Enjoy $FILENAME"
-echo "[!] Thanks for using Rolle's shitty script!"
